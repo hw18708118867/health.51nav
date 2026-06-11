@@ -35,3 +35,4 @@ npm run dev
 - Expand the search index to include every calculator and article
 - Add the remaining long-form blog articles until you reach the 50-post target
 - Introduce Google AdSense blocks only after traffic and UX data justify it
+- ttt
