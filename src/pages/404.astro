@@ -1,0 +1,47 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { withBasePath } from "../utils/site";
+
+const quickLinks = [
+  { href: "/calculators", label: "All calculators", blurb: "Browse every health and fitness tool in one place." },
+  { href: "/blog", label: "Health guides", blurb: "Plain-language articles that explain the numbers." },
+  { href: "/search", label: "Search", blurb: "Look up a calculator or topic by name." },
+  { href: "/contact", label: "Contact", blurb: "Report a broken link or suggest a tool." }
+];
+---
+
+<BaseLayout
+  title="Page not found - HealthCalcHub"
+  description="The page you are looking for could not be found. Browse the HealthCalcHub calculators and guides instead."
+  robots="noindex,follow"
+>
+  <section class="section-shell brand-frame soft-grid overflow-hidden p-8 sm:p-10">
+    <div class="max-w-3xl">
+      <div class="flex flex-wrap gap-2">
+        <span class="eyebrow">Error 404</span>
+        <span class="wellness-chip">Page not found</span>
+      </div>
+      <h1 class="heading-display mt-5">This page could not be found.</h1>
+      <p class="mt-5 text-lg leading-8 text-ink/74">
+        The link may be broken, or the page may have moved. The tools and guides below are a good place to pick things back up.
+      </p>
+      <div class="mt-7">
+        <a
+          href={withBasePath("/")}
+          class="inline-flex rounded-full bg-pine px-5 py-3 text-sm font-bold text-white shadow-float hover:bg-pine/92"
+        >
+          Back to homepage
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mt-10 grid gap-5 md:grid-cols-2">
+    {quickLinks.map((link) => (
+      <a href={withBasePath(link.href)} class="surface-card brand-frame p-6 transition hover:bg-mint/40">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine">{link.label}</p>
+        <p class="mt-3 text-sm leading-7 text-ink/72">{link.blurb}</p>
+      </a>
+    ))}
+  </section>
+</BaseLayout>

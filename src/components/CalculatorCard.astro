@@ -1,0 +1,38 @@
+---
+import { categoryLabels } from "../data/calculators";
+import ToolIcon from "./ToolIcon.astro";
+import type { CalculatorConfig } from "../types/calculator";
+import { withBasePath } from "../utils/site";
+
+type Props = {
+  calculator: CalculatorConfig;
+};
+
+const { calculator } = Astro.props;
+---
+
+<a
+  href={withBasePath(`/${calculator.slug}`)}
+  class="group surface-card brand-frame flex h-full flex-col justify-between overflow-hidden p-6 transition duration-300 hover:-translate-y-1"
+>
+  <div class="space-y-4">
+    <div class="flex items-start justify-between gap-3">
+      <span class="eyebrow">{categoryLabels[calculator.category]}</span>
+      <div class="flex items-start gap-3">
+        <span class="rounded-full bg-sky px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-pine/75">Free tool</span>
+        <ToolIcon slug={calculator.slug} size="sm" />
+      </div>
+    </div>
+    <div>
+      <h3 class="text-2xl font-bold tracking-tight text-ink">{calculator.title}</h3>
+      <p class="mt-3 text-sm leading-7 text-ink/72">{calculator.cardBlurb}</p>
+    </div>
+  </div>
+  <div class="mt-6 flex items-center justify-between gap-3">
+    <span class="text-sm text-ink/55">Simple inputs, quick result, clear explanation</span>
+    <span class="inline-flex items-center gap-2 text-sm font-semibold text-pine">
+      Open tool
+      <span class="transition-transform duration-300 group-hover:translate-x-1">→</span>
+    </span>
+  </div>
+</a>

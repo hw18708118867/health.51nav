@@ -1,0 +1,70 @@
+<section class="section-shell brand-frame p-6 sm:p-8" data-updates-preference>
+  <div class="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+    <div>
+      <span class="eyebrow">Stay Connected</span>
+      <h2 class="mt-4 font-serif text-4xl text-ink">Save your interests for future updates</h2>
+      <p class="mt-3 max-w-2xl text-sm leading-7 text-ink/68">
+        This module stores your topic preferences only in this browser for now. It helps shape which tools or content
+        you want to come back to when the next release wave lands.
+      </p>
+      <div class="mt-5 grid gap-3 sm:grid-cols-2">
+        <div class="tinted-panel tinted-panel-sage px-4 py-4">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine/72">Local only</p>
+          <p class="mt-2 text-sm leading-7 text-ink/72">No email is sent anywhere yet. Preferences stay on this device.</p>
+        </div>
+        <div class="tinted-panel tinted-panel-sky px-4 py-4">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine/72">Useful later</p>
+          <p class="mt-2 text-sm leading-7 text-ink/72">When a real update channel is added, these saved interests can guide the first signup flow.</p>
+        </div>
+      </div>
+    </div>
+
+    <form class="surface-card p-5 sm:p-6" data-updates-form>
+      <label class="field-shell">
+        <span class="text-sm font-semibold text-ink/82">Display name</span>
+        <input name="name" type="text" placeholder="Optional nickname" class="field-input" />
+      </label>
+      <fieldset class="mt-4">
+        <legend class="text-sm font-semibold text-ink/82">What do you want more of?</legend>
+        <div class="mt-4 grid gap-3 sm:grid-cols-2">
+          <label class="touch-card flex items-center gap-3">
+            <input type="checkbox" name="topics" value="fitness-tools" />
+            <span class="text-sm text-ink/78">More fitness tools</span>
+          </label>
+          <label class="touch-card flex items-center gap-3">
+            <input type="checkbox" name="topics" value="nutrition-guides" />
+            <span class="text-sm text-ink/78">Nutrition guides</span>
+          </label>
+          <label class="touch-card flex items-center gap-3">
+            <input type="checkbox" name="topics" value="pregnancy-tools" />
+            <span class="text-sm text-ink/78">Pregnancy planning tools</span>
+          </label>
+          <label class="touch-card flex items-center gap-3">
+            <input type="checkbox" name="topics" value="daily-health" />
+            <span class="text-sm text-ink/78">Daily health tracking</span>
+          </label>
+        </div>
+      </fieldset>
+      <label class="field-shell mt-4">
+        <span class="text-sm font-semibold text-ink/82">Notes</span>
+        <textarea
+          name="notes"
+          rows="4"
+          placeholder="What would make you come back more often?"
+          class="field-input resize-none"
+        ></textarea>
+      </label>
+      <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <button type="submit" class="inline-flex rounded-full bg-pine px-6 py-3 text-sm font-bold text-white shadow-float hover:bg-pine/92">
+          Save Preferences
+        </button>
+        <p class="text-xs uppercase tracking-[0.14em] text-ink/50">Stored only in this browser</p>
+      </div>
+      <p data-updates-feedback class="mt-4 text-sm leading-7 text-ink/70"></p>
+    </form>
+  </div>
+</section>
+
+<script>
+  import "../scripts/updates-preference";
+</script>

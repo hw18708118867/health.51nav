@@ -1,0 +1,24 @@
+---
+import type { FaqItem } from "../types/calculator";
+
+type Props = {
+  items: FaqItem[];
+};
+
+const { items } = Astro.props;
+---
+
+<div class="space-y-4">
+  {items.map((item) => (
+    <details class="faq-shell surface-card group px-5 py-5">
+      <summary class="flex cursor-pointer list-none items-start justify-between gap-4 text-lg font-semibold text-ink">
+        <span class="flex-1">{item.question}</span>
+        <div class="faq-summary-meta">
+          <span class="faq-summary-chip mt-1 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-pine/75 transition group-open:bg-sky">Answer</span>
+          <span class="faq-summary-indicator" aria-hidden="true"></span>
+        </div>
+      </summary>
+      <p class="mt-3 leading-7 text-ink/75">{item.answer}</p>
+    </details>
+  ))}
+</div>

@@ -1,0 +1,24 @@
+---
+import { getToolIconMeta, renderToolIconSvg } from "../utils/tool-icons";
+
+type Props = {
+  slug: string;
+  label?: string;
+  size?: "sm" | "md" | "lg";
+};
+
+const { slug, label, size = "md" } = Astro.props;
+const meta = getToolIconMeta(slug);
+const iconLabel = label ?? meta.label;
+const sizeClasses =
+  size === "sm"
+    ? "tool-icon-shell tool-icon-shell-sm"
+    : size === "lg"
+      ? "tool-icon-shell tool-icon-shell-lg"
+      : "tool-icon-shell tool-icon-shell-md";
+---
+
+<span class={`${sizeClasses} tool-icon-${meta.category}`} aria-hidden="true">
+  <span class="sr-only">{iconLabel}</span>
+  <Fragment set:html={renderToolIconSvg(slug)} />
+</span>

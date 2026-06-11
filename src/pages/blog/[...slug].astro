@@ -1,0 +1,232 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection, render } from "astro:content";
+import { calculatorMap } from "../../data/calculators";
+import ArticleCard from "../../components/ArticleCard.astro";
+import CalculatorCard from "../../components/CalculatorCard.astro";
+import { formatDateLabel } from "../../utils/date";
+import { estimateArticleWords, estimateExtensionWords, getArticleExtension } from "../../utils/blog-article-extensions";
+import { withBasePath } from "../../utils/site";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post }
+  }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+const related = post.data.relatedCalculators
+  .map((slug: string) => calculatorMap.get(slug))
+  .filter((calculator): calculator is NonNullable<typeof calculator> => Boolean(calculator));
+const relatedPosts = (await getCollection("blog", ({ data }) => !data.draft))
+  .filter((entry) => entry.slug !== post.slug && entry.data.category === post.data.category)
+  .slice(0, 3);
+const categoryLabelMap = {
+  fitness: "Fitness",
+  nutrition: "Nutrition",
+  pregnancy: "Pregnancy",
+  health: "Health"
+} as const;
+const tocItems = headings.filter((heading) => heading.depth <= 2);
+const articleWordCount = estimateArticleWords(post.body);
+const needsExpansion = articleWordCount < 1000;
+const articleExtension = getArticleExtension(
+  {
+    title: post.data.title,
+    category: post.data.category,
+    tags: post.data.tags,
+    relatedCalculators: post.data.relatedCalculators
+  },
+  related.map((calculator) => ({
+    slug: calculator.slug,
+    title: calculator.title
+  }))
+);
+const displayedWordCount = needsExpansion ? articleWordCount + estimateExtensionWords(articleExtension) : articleWordCount;
+const metadataCards = [
+  {
+    label: "Category",
+    value: categoryLabelMap[post.data.category]
+  },
+  {
+    label: "Related tools",
+    value: related.length ? `${related.length} linked` : "Guide only"
+  },
+  {
+    label: "Topic tags",
+    value: post.data.tags.length ? `${post.data.tags.slice(0, 2).join(" / ")}` : "General wellness"
+  }
+];
+---
+
+<BaseLayout title={`${post.data.title} - HealthCalcHub`} description={post.data.description}>
+  <article class="section-shell brand-frame soft-grid p-8 sm:p-10">
+    <div class="max-w-5xl">
+      <p class="story-kicker">HealthCalcHub Article</p>
+      <div class="mt-4 flex flex-wrap gap-2">
+        <span class="eyebrow">{categoryLabelMap[post.data.category]}</span>
+        <span class="wellness-chip">Straightforward explanation</span>
+        {post.data.tags.slice(0, 2).map((tag) => <span class="wellness-chip !bg-white/72 !text-pine/76">#{tag.replaceAll("-", " ")}</span>)}
+      </div>
+      <h1 class="heading-display mt-5 max-w-4xl">{post.data.title}</h1>
+      <p class="mt-5 max-w-3xl text-lg leading-8 text-ink/74">{post.data.description}</p>
+      <div class="mt-6 flex flex-wrap gap-3 text-sm text-ink/58">
+        <span class="trust-pill"><span class="info-dot"></span>Published {formatDateLabel(post.data.publishDate)}</span>
+        <span class="trust-pill"><span class="info-dot"></span>{post.data.author}</span>
+        <span class="trust-pill"><span class="info-dot"></span>{displayedWordCount}+ words</span>
+      </div>
+      <div class="reading-metadata-grid mt-7">
+        {metadataCards.map((item) => (
+          <div class="reading-metadata-card">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine/74">{item.label}</p>
+            <p class="mt-2 text-sm font-bold leading-6 text-ink">{item.value}</p>
+          </div>
+        ))}
+      </div>
+      <div class="editorial-support-grid mt-8 !grid-cols-1 sm:!grid-cols-3">
+        <div class="editorial-support-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine/75">Best for</p>
+          <p class="mt-2 text-sm leading-7 text-ink/72">People who want a quick explanation before using a calculator or acting on a result.</p>
+        </div>
+        <div class="editorial-support-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine/75">Reading style</p>
+          <p class="mt-2 text-sm leading-7 text-ink/72">Short sections, direct wording, and no extra fluff.</p>
+        </div>
+        <div class="editorial-support-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine/75">Next step</p>
+          <p class="mt-2 text-sm leading-7 text-ink/72">Open a related calculator when you want to apply the idea to your own numbers.</p>
+        </div>
+      </div>
+    </div>
+    <div class="editorial-rule mt-10"></div>
+    <div class="mt-10 grid gap-8 xl:grid-cols-[minmax(0,1fr)_280px]">
+      <div class="space-y-6">
+        <div class="editorial-spotlight brand-frame">
+          <span class="eyebrow">Before You Read</span>
+          <h2 class="mt-4 font-serif text-3xl text-ink">This article is here to make the topic easier to use in real life.</h2>
+          <p class="mt-4 text-sm leading-8 text-ink/72">
+            Use it to understand the number, see what affects it, and decide whether a calculator is the next page you need.
+          </p>
+          {related.length > 0 && (
+            <div class="ecosystem-chip-row">
+              {related.slice(0, 4).map((calculator) => (
+                <a href={withBasePath(`/${calculator.slug}`)} class="ecosystem-chip">
+                  {calculator.title}
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+        {tocItems.length > 0 && (
+          <div class="note-card">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-pine/74">In this guide</p>
+            <div class="mt-3 grid gap-2 sm:grid-cols-2">
+              {tocItems.slice(0, 6).map((item) => (
+                <a href={`#${item.slug}`} class="toc-link bg-mint/55">
+                  {item.text}
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+        <div class="reading-shell reading-shell-premium surface-card !rounded-[2rem] p-6 sm:p-8">
+          <div class="prose prose-lg max-w-none prose-headings:font-serif prose-li:text-ink/75">
+            <Content />
+          </div>
+        </div>
+        {needsExpansion && (
+          <div class="reading-shell reading-shell-premium surface-card !rounded-[2rem] p-6 sm:p-8">
+            <div class="prose prose-lg max-w-none prose-headings:font-serif prose-li:text-ink/75">
+              <h2>More context</h2>
+              <p>{articleExtension.intro}</p>
+              {articleExtension.sections.map((section) => (
+                <>
+                  <h3>{section.title}</h3>
+                  {section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+                  {section.bullets && (
+                    <ul>
+                      {section.bullets.map((bullet) => <li>{bullet}</li>)}
+                    </ul>
+                  )}
+                </>
+              ))}
+              <p>{articleExtension.closing}</p>
+            </div>
+          </div>
+        )}
+      </div>
+      <aside class="space-y-4 xl:sticky xl:top-6 xl:self-start">
+        <div class="reading-sidebar-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-pine/74">How to use this article</p>
+          <p class="mt-3 text-sm leading-7 text-ink/72">
+            Read the explanation first, then open the matching calculator when you want an estimate based on your own details.
+          </p>
+        </div>
+        {tocItems.length > 0 && (
+          <div class="reading-sidebar-card hidden xl:block">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-pine/74">Jump to a section</p>
+            <div class="mt-3 space-y-1">
+              {tocItems.map((item) => (
+                <a href={`#${item.slug}`} class="toc-link">
+                  {item.text}
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+        {related.length > 0 && (
+          <div class="reading-sidebar-card">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-pine/74">Best next tool</p>
+            <a href={withBasePath(`/${related[0].slug}`)} class="mt-3 block rounded-[1.25rem] bg-mint/72 px-4 py-4 transition hover:bg-mint">
+              <p class="text-sm font-semibold text-pine">{related[0].title}</p>
+              <p class="mt-2 text-sm leading-6 text-ink/70">{related[0].cardBlurb}</p>
+            </a>
+          </div>
+        )}
+        <div class="reading-sidebar-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-pine/74">Why this page helps</p>
+          <p class="mt-3 text-sm leading-7 text-ink/72">
+            Reading a short explanation first usually makes the calculator result easier to judge.
+          </p>
+        </div>
+      </aside>
+    </div>
+  </article>
+
+  {relatedPosts.length > 0 && (
+    <section class="mt-10">
+      <div class="section-hero-split mb-6">
+        <div>
+          <span class="eyebrow">Keep Reading</span>
+          <h2 class="mt-4 font-serif text-4xl text-ink">More on this topic</h2>
+        </div>
+        <div class="section-intro-card max-w-2xl">
+          <p class="text-sm leading-7 text-ink/72">If this article helped, these nearby topics are usually the next ones people want to read.</p>
+        </div>
+      </div>
+      <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        {relatedPosts.map((entry) => <ArticleCard post={entry} />)}
+      </div>
+    </section>
+  )}
+
+  {related.length > 0 && (
+    <section class="mt-10">
+      <div class="section-hero-split mb-6">
+        <div>
+          <span class="eyebrow">Related Calculators</span>
+          <h2 class="mt-4 font-serif text-4xl text-ink">Try the related tools</h2>
+        </div>
+        <div class="section-intro-card max-w-2xl">
+          <p class="text-sm leading-7 text-ink/72">These calculators match the topic you just read, so you can move from explanation to your own estimate without extra searching.</p>
+        </div>
+      </div>
+      <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        {related.map((calculator) => <CalculatorCard calculator={calculator} />)}
+      </div>
+    </section>
+  )}
+</BaseLayout>

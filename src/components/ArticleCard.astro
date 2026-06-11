@@ -1,0 +1,51 @@
+---
+import CategoryIcon from "./CategoryIcon.astro";
+import { formatDateLabel } from "../utils/date";
+import { withBasePath } from "../utils/site";
+
+type BlogEntry = {
+  slug: string;
+  data: {
+    title: string;
+    description: string;
+    publishDate: Date;
+    category: string;
+  };
+};
+
+type Props = {
+  post: BlogEntry;
+};
+
+const { post } = Astro.props;
+const categoryLabel = `${post.data.category.charAt(0).toUpperCase()}${post.data.category.slice(1)}`;
+const categoryKey = post.data.category as "fitness" | "nutrition" | "pregnancy" | "health";
+---
+
+<article class="surface-card brand-frame group overflow-hidden p-5 transition duration-300 hover:-translate-y-1">
+  <div class="flex items-start justify-between gap-4">
+    <div class="h-1 w-20 rounded-full bg-pulse-soft opacity-80"></div>
+    <CategoryIcon category={categoryKey} size="sm" />
+  </div>
+  <div class="mt-4 flex items-center justify-between gap-3">
+    <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine">{categoryLabel}</p>
+    <span class="rounded-full bg-mint px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-pine/75">Guide</span>
+  </div>
+  <h3 class="mt-3 text-xl font-bold text-ink">
+    <a href={withBasePath(`/blog/${post.slug}`)} class="hover:text-pine">{post.data.title}</a>
+  </h3>
+  <p class="mt-3 text-sm leading-7 text-ink/72">{post.data.description}</p>
+  <div class="mt-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <p class="text-xs uppercase tracking-[0.12em] text-ink/45">{formatDateLabel(post.data.publishDate)}</p>
+      <p class="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-pine/58">Pairs with a related calculator</p>
+    </div>
+    <a
+      href={withBasePath(`/blog/${post.slug}`)}
+      class="inline-flex shrink-0 self-start whitespace-nowrap rounded-full bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-pine shadow-float transition group-hover:bg-mint sm:self-auto"
+    >
+      Read more
+      <span class="transition-transform duration-300 group-hover:translate-x-1">→</span>
+    </a>
+  </div>
+</article>

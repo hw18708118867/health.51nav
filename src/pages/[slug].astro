@@ -1,0 +1,19 @@
+---
+import CalculatorLayout from "../layouts/CalculatorLayout.astro";
+import { calculators, calculatorMap } from "../data/calculators";
+
+export async function getStaticPaths() {
+  return calculators.map((calculator) => ({
+    params: { slug: calculator.slug },
+    props: { calculator }
+  }));
+}
+
+const { calculator } = Astro.props;
+
+if (!calculatorMap.has(calculator.slug)) {
+  throw new Error(`Unknown calculator: ${calculator.slug}`);
+}
+---
+
+<CalculatorLayout calculator={calculator} />

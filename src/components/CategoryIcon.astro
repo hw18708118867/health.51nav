@@ -1,0 +1,26 @@
+---
+type Category = "fitness" | "nutrition" | "pregnancy" | "health";
+
+type Props = {
+  category: Category;
+  size?: "sm" | "md";
+};
+
+const { category, size = "sm" } = Astro.props;
+const sizeClass = size === "md" ? "category-icon-shell category-icon-shell-md" : "category-icon-shell category-icon-shell-sm";
+
+const svgByCategory: Record<Category, string> = {
+  fitness:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="category-icon-svg"><path d="M7 9 9 7l2 2"/><path d="m15 9-2-2-2 2"/><path d="M5 11h4v2H5z"/><path d="M15 11h4v2h-4z"/><path d="M9 10v4"/><path d="M15 10v4"/><path d="M9 14h6"/></svg>',
+  nutrition:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="category-icon-svg"><path d="M8 4v8"/><path d="M6 4v8"/><path d="M10 4v8"/><path d="M8 12v8"/><path d="M15 4c1.6 0 3 1.4 3 3v13"/><path d="M15 12h3"/></svg>',
+  pregnancy:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="category-icon-svg"><path d="M10 6a2 2 0 1 1 4 0"/><path d="M8.5 10c0-1.7 1.6-3 3.5-3s3.5 1.3 3.5 3v4.5A4.5 4.5 0 0 1 11 19h-1"/><path d="M14 13c0 1.7-1.3 3-3 3"/></svg>',
+  health:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="category-icon-svg"><path d="M4 13h4l2-4 3 7 2-3h5"/><path d="M4 18h16"/></svg>'
+};
+---
+
+<span class={`${sizeClass} category-icon-${category}`} aria-hidden="true">
+  <Fragment set:html={svgByCategory[category]} />
+</span>

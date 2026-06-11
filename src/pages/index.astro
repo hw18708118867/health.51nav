@@ -1,0 +1,425 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ArticleCard from "../components/ArticleCard.astro";
+import RecentTools from "../components/RecentTools.astro";
+import ToolIcon from "../components/ToolIcon.astro";
+import { calculators, categoryLabels } from "../data/calculators";
+import { getCollection } from "astro:content";
+import type { CalculatorConfig } from "../types/calculator";
+import { withBasePath } from "../utils/site";
+
+const blogPosts = (await getCollection("blog", ({ data }) => !data.draft))
+  .sort((a, b) => new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime())
+  .slice(0, 6);
+
+const grouped = Object.entries(categoryLabels).map(([key, label]) => ({
+  key,
+  label,
+  items: calculators.filter((calculator) => calculator.category === key)
+}));
+
+const featuredTools = [
+  "bmi-calculator",
+  "calorie-calculator",
+  "macro-calculator",
+  "ovulation-calculator",
+  "sleep-calculator",
+  "water-intake-calculator"
+]
+  .map((slug) => calculators.find((calculator) => calculator.slug === slug))
+  .filter((calculator): calculator is CalculatorConfig => Boolean(calculator));
+
+const quickPaths = [
+  {
+    title: "Trying to lose weight",
+    description: "Start with calories, macros, protein, and a clearer picture of your body metrics.",
+    href: withBasePath("/calorie-calculator"),
+    links: [
+      { label: "Calorie Calculator", href: withBasePath("/calorie-calculator") },
+      { label: "BMI Calculator", href: withBasePath("/bmi-calculator") },
+      { label: "Macro Calculator", href: withBasePath("/macro-calculator") }
+    ]
+  },
+  {
+    title: "Planning pregnancy or fertility",
+    description: "Check ovulation timing, due dates, and pregnancy weight gain ranges without bouncing between unrelated pages.",
+    href: withBasePath("/ovulation-calculator"),
+    links: [
+      { label: "Ovulation Calculator", href: withBasePath("/ovulation-calculator") },
+      { label: "Due Date Calculator", href: withBasePath("/due-date-calculator") },
+      { label: "Pregnancy Weight Gain", href: withBasePath("/pregnancy-weight-gain-calculator") }
+    ]
+  },
+  {
+    title: "Improving daily wellness",
+    description: "Use hydration, sleep, blood pressure, and heart-rate tools as an easy daily check-in.",
+    href: withBasePath("/sleep-calculator"),
+    links: [
+      { label: "Sleep Calculator", href: withBasePath("/sleep-calculator") },
+      { label: "Water Intake", href: withBasePath("/water-intake-calculator") },
+      { label: "Blood Pressure", href: withBasePath("/blood-pressure-calculator") }
+    ]
+  }
+];
+
+const categoryThemes = {
+  fitness: {
+    panelClass: "tinted-panel tinted-panel-sage",
+    cue: "Body metrics, energy use, strength support",
+    icon: "Move"
+  },
+  nutrition: {
+    panelClass: "tinted-panel tinted-panel-sky",
+    cue: "Calories, macros, meals, hydration",
+    icon: "Fuel"
+  },
+  pregnancy: {
+    panelClass: "tinted-panel tinted-panel-coral",
+    cue: "Cycle timing, due dates, pregnancy weight gain",
+    icon: "Care"
+  },
+  health: {
+    panelClass: "tinted-panel",
+    cue: "Sleep, heart rate, blood pressure, daily wellness",
+    icon: "Restore"
+  }
+} as const;
+
+const readingBenefits = [
+  "Read a short guide before deciding what a number really means.",
+  "Compare nearby articles when one question turns into a second one.",
+  "Open the matching calculator once you have enough context to use it well."
+];
+
+const snapshotSignals = [
+  {
+    label: "Most searched goals",
+    value: "Fat loss, sleep timing, fertility planning"
+  },
+  {
+    label: "Best first tools",
+    value: "BMI, calorie, macro, ovulation"
+  },
+  {
+    label: "Typical next step",
+    value: "Read a guide, compare a nearby calculator, come back later"
+  }
+];
+
+const heroCompass = [
+  {
+    title: "Weight and performance",
+    value: "Body metrics, calories, macros, protein"
+  },
+  {
+    title: "Nutrition choices",
+    value: "Meals, carbs, fats, fiber, hydration"
+  },
+  {
+    title: "Pregnancy planning",
+    value: "Due dates, ovulation, healthy weight gain"
+  },
+  {
+    title: "Daily wellness",
+    value: "Sleep, blood pressure, heart rate, BAC"
+  }
+];
+---
+
+<BaseLayout
+  title="HealthCalcHub - Health Calculators and Wellness Guides"
+  description="BMI, calorie, macro, ovulation, sleep, hydration, and other health calculators with clear articles that explain what the numbers mean."
+>
+  <section class="hero-stage section-shell brand-frame soft-grid overflow-hidden px-6 py-10 sm:px-10 sm:py-14">
+    <div class="grid gap-8 lg:grid-cols-[1.16fr_0.84fr] lg:items-start">
+      <div class="max-w-4xl">
+        <div class="flex flex-wrap gap-2">
+          <span class="eyebrow">HealthCalcHub</span>
+          <span class="wellness-chip">BMI, calories, sleep, pregnancy</span>
+        </div>
+        <h1 class="heading-display mt-5 max-w-3xl">Health calculators and guides for everyday questions.</h1>
+        <p class="mt-5 max-w-2xl text-lg leading-8 text-ink/74">
+          Use HealthCalcHub to check BMI, calories, macros, ovulation, sleep, hydration, and other common health numbers, then read a clear explanation of what the result means.
+        </p>
+        <div class="mt-6 flex flex-wrap gap-3 text-sm text-ink/72">
+          <span class="wellness-chip">Metric and imperial options</span>
+          <span class="wellness-chip">Clear result explanations</span>
+          <span class="wellness-chip">Related articles and tools</span>
+        </div>
+        <div class="mt-7 flex flex-wrap gap-4">
+          <a href={withBasePath("/calculators")} class="rounded-full bg-pine px-6 py-3 text-sm font-bold text-white shadow-float hover:bg-pine/92">Start With a Calculator</a>
+          <a href={withBasePath("/blog")} class="rounded-full border border-white/80 bg-white/90 px-6 py-3 text-sm font-bold text-ink shadow-float hover:border-sage hover:text-sage">Read the Guides</a>
+        </div>
+        <div class="mobile-pill-row mt-7 sm:hidden">
+          <span class="wellness-chip whitespace-nowrap">Weight goals</span>
+          <span class="wellness-chip whitespace-nowrap">Nutrition planning</span>
+          <span class="wellness-chip whitespace-nowrap">Pregnancy support</span>
+          <span class="wellness-chip whitespace-nowrap">Daily wellness</span>
+        </div>
+        <div class="mt-7 grid gap-4 sm:grid-cols-3">
+          <div class="tinted-panel tinted-panel-sage p-4">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-pine/72">Use it fast</p>
+            <p class="mt-3 text-lg font-bold text-ink">Open a tool, enter a few details, and get a result in seconds.</p>
+          </div>
+          <div class="tinted-panel tinted-panel-sky p-4">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-pine/72">Understand it</p>
+            <p class="mt-3 text-lg font-bold text-ink">Each calculator explains what the number means and what to look at next.</p>
+          </div>
+          <div class="tinted-panel tinted-panel-coral p-4">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-pine/72">Read more</p>
+            <p class="mt-3 text-lg font-bold text-ink">Move to a related tool or article when you need a fuller picture.</p>
+          </div>
+        </div>
+        <div class="hero-compass-grid mt-6">
+          {heroCompass.map((item) => (
+            <div class="hero-compass-card">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-pine/66">{item.title}</p>
+              <p class="mt-3 text-sm font-bold leading-6 text-ink">{item.value}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="grid gap-4 lg:pt-2">
+        <div class="hero-orbit rounded-[2rem] bg-pulse-soft p-5 text-white shadow-panel sm:p-6">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <p class="text-sm uppercase tracking-[0.18em] text-white/76">Daily Wellness Snapshot</p>
+              <p class="mt-3 text-3xl font-black">Common tools in one place</p>
+            </div>
+            <span class="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/78">Popular tools</span>
+          </div>
+          <p class="mt-3 text-sm leading-7 text-white/84">Check calories, hydration, cycle timing, sleep windows, or heart-rate zones without digging through cluttered pages.</p>
+          <div class="mt-4 grid gap-3 sm:grid-cols-3">
+            <div class="hero-metric-card">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/64">Tools live</p>
+              <p class="mt-2 text-2xl font-black text-white">21</p>
+            </div>
+            <div class="hero-metric-card">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/64">Guides linked</p>
+              <p class="mt-2 text-2xl font-black text-white">57</p>
+            </div>
+            <div class="hero-metric-card">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/64">What you get</p>
+              <p class="mt-2 text-sm font-bold leading-6 text-white">Fast results with clear context</p>
+            </div>
+          </div>
+          <div class="hero-console mt-4">
+            {snapshotSignals.map((signal) => (
+              <div class="hero-console-row">
+                <p class="hero-console-label">{signal.label}</p>
+                <p class="hero-console-value">{signal.value}</p>
+              </div>
+            ))}
+          </div>
+          <div class="mt-4 grid gap-3 sm:grid-cols-2">
+            {featuredTools.slice(0, 4).map((tool) => (
+              <a href={withBasePath(`/${tool.slug}`)} class="snapshot-tool">
+                <ToolIcon slug={tool.slug} size="sm" />
+                <div>
+                  <p class="snapshot-tool-label">Popular</p>
+                  <p class="snapshot-tool-title">{tool.title}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+          <div class="mt-4 grid gap-3 sm:grid-cols-3">
+            <div class="insight-card">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/68">Weight goals</p>
+              <p class="mt-2 text-sm leading-6 text-white/90">BMI, calories, macros, protein</p>
+            </div>
+            <div class="insight-card">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/68">Daily wellness</p>
+              <p class="mt-2 text-sm leading-6 text-white/90">Water, sleep, blood pressure</p>
+            </div>
+            <div class="insight-card">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/68">Pregnancy planning</p>
+              <p class="mt-2 text-sm leading-6 text-white/90">Ovulation, due date, weight gain</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-8 grid gap-4 lg:grid-cols-[1.08fr_0.92fr]">
+      <div class="surface-card p-6 sm:p-7">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p class="text-sm uppercase tracking-[0.18em] text-pine">Start With a Real Goal</p>
+            <p class="mt-3 max-w-2xl text-lg font-bold text-ink">Pick the path that matches why someone actually came here.</p>
+          </div>
+          <span class="trust-pill"><span class="info-dot"></span>Common starting points</span>
+        </div>
+        <div class="mt-6 grid gap-4 md:grid-cols-3">
+          {quickPaths.map((path) => (
+            <a href={path.href} class="path-card brand-frame !p-5">
+              <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine">{path.title}</p>
+              <p class="mt-3 text-sm leading-7 text-ink/72">{path.description}</p>
+              <div class="mt-4 flex items-center justify-between gap-3 text-sm font-semibold text-pine">
+                <span>Open the best first tool</span>
+                <span class="site-nav-arrow">→</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+      <div class="surface-card p-6 sm:p-7">
+        <p class="text-sm uppercase tracking-[0.18em] text-pine">Popular First Clicks</p>
+        <p class="mt-3 text-lg font-bold text-ink">Tools people often look for first.</p>
+        <div class="mt-6 grid gap-3">
+          {featuredTools.slice(0, 5).map((tool, index) => (
+            <a href={withBasePath(`/${tool.slug}`)} class="path-link">
+              <span class="inline-flex items-center gap-3">
+                <span class="rounded-full bg-mint px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-pine/76">
+                  {`0${index + 1}`}
+                </span>
+                <span class="text-sm font-semibold text-ink">{tool.title}</span>
+              </span>
+              <span class="site-nav-arrow">→</span>
+            </a>
+          ))}
+        </div>
+        <div class="mt-6 grid gap-3 sm:grid-cols-2">
+          <div class="tinted-panel tinted-panel-sage px-4 py-4">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-pine/72">Live now</p>
+            <p class="mt-2 text-2xl font-black text-ink">{calculators.length}</p>
+            <p class="mt-2 text-sm leading-6 text-ink/72">calculators across fitness, nutrition, pregnancy, and health.</p>
+          </div>
+          <div class="tinted-panel tinted-panel-sky px-4 py-4">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-pine/72">Read deeper</p>
+            <p class="mt-2 text-2xl font-black text-ink">{blogPosts.length}+</p>
+            <p class="mt-2 text-sm leading-6 text-ink/72">guides featured on the homepage, with more available in the blog.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mt-10">
+    <div class="section-hero-split mb-6">
+      <div>
+        <span class="eyebrow">Quick Start</span>
+        <h2 class="mt-4 font-serif text-4xl text-ink">Start from the situation you are actually in</h2>
+      </div>
+      <div class="section-intro-card max-w-2xl">
+        <p class="text-sm leading-7 text-ink/70">These paths are based on the way people actually search: by goal, by life stage, or by a specific concern.</p>
+        
+      </div>
+    </div>
+    <div class="grid gap-5 lg:grid-cols-3">
+      {quickPaths.map((path) => (
+        <section class="path-card brand-frame">
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-pine">{path.title}</p>
+          <p class="mt-3 text-xl font-bold text-ink">{path.description}</p>
+          <div class="mt-5 space-y-3 text-sm text-ink/72">
+            {path.links.map((link) => (
+              <a href={link.href} class="path-link">
+                <span>{link.label}</span>
+                <span class="font-semibold text-pine">→</span>
+              </a>
+            ))}
+          </div>
+          <a href={path.href} class="mt-5 inline-flex rounded-full bg-pine px-5 py-2.5 text-sm font-bold text-white shadow-float hover:bg-pine/92">Open the first tool</a>
+        </section>
+      ))}
+    </div>
+  </section>
+
+  <section class="mt-10" id="categories">
+    <div class="section-hero-split mb-6">
+      <div>
+        <span class="eyebrow">Categories</span>
+        <h2 class="mt-4 font-serif text-4xl text-ink">Explore by life context, not just by keyword</h2>
+      </div>
+      <div class="section-intro-card max-w-2xl">
+        <p class="text-sm leading-7 text-ink/68">The calculators are grouped the way people usually think about them: weight and fitness, food and nutrition, pregnancy, and daily health checks.</p>
+      </div>
+    </div>
+    <div class="category-stack">
+      {grouped.map((group) => (
+        <div class={`topic-library-card ${categoryThemes[group.key as keyof typeof categoryThemes].panelClass}`}>
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-pine/68">
+                {categoryThemes[group.key as keyof typeof categoryThemes].icon}
+              </p>
+              <h3 class="mt-2 text-2xl font-bold text-ink">{group.label}</h3>
+            </div>
+            <span class="rounded-full bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-pine">{group.items.length} tools</span>
+          </div>
+          <p class="mt-3 text-sm leading-7 text-ink/68">{categoryThemes[group.key as keyof typeof categoryThemes].cue}</p>
+          <ul class="topic-library-list mt-5 space-y-2 text-sm leading-6 text-ink/72">
+            {group.items.slice(0, 5).map((item) => (
+              <li>
+                <a href={withBasePath(`/${item.slug}`)} class="hover:text-pine">
+                  <span>{item.title}</span>
+                  <span class="text-pine/60">→</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <a href={withBasePath(`/calculators#${group.key}`)} class="mt-5 inline-flex rounded-full bg-pine px-4 py-2.5 text-sm font-bold text-white shadow-float hover:bg-pine/92">
+            Explore {group.label}
+          </a>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="mt-10">
+    <RecentTools />
+  </section>
+
+  <section class="mt-10 ecosystem-shell">
+    <div class="section-hero-split">
+      <div>
+        <span class="eyebrow">Helpful Reading</span>
+        <h2 class="mt-4 font-serif text-4xl text-ink">Read a little more when the number needs context.</h2>
+      </div>
+      <div class="section-intro-card max-w-2xl">
+        <p class="text-sm leading-7 text-ink/72">These articles cover calories, BMI, sleep, fertility, hydration, and similar topics that often need a short explanation before the result makes sense.</p>
+      </div>
+    </div>
+    <div class="ecosystem-grid">
+      <div>
+        <div class="grid gap-5 xl:grid-cols-2">
+          {blogPosts.map((post) => (
+            <ArticleCard post={post} />
+          ))}
+        </div>
+      </div>
+      <div class="ecosystem-rail">
+        <div class="ecosystem-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-pine">Why read first</p>
+          <p class="mt-3 text-xl font-bold text-ink">Some health numbers make more sense once you know what can affect them.</p>
+          <div class="mt-4 space-y-3 text-sm leading-7 text-ink/72">
+            {readingBenefits.map((benefit) => (
+              <p>{benefit}</p>
+            ))}
+          </div>
+        </div>
+        <div class="ecosystem-card ecosystem-card-soft">
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-pine">Good places to start</p>
+          <div class="mt-4 space-y-3">
+            {blogPosts.slice(0, 3).map((post) => (
+              <a href={withBasePath(`/blog/${post.slug}`)} class="path-link">
+                <span>{post.data.title}</span>
+                <span class="text-pine/60">→</span>
+              </a>
+            ))}
+          </div>
+        </div>
+        <div class="ecosystem-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-pine">Then check your numbers</p>
+          <div class="mt-4 space-y-3">
+            {featuredTools.slice(0, 3).map((tool) => (
+              <a href={withBasePath(`/${tool.slug}`)} class="path-link">
+                <span>{tool.title}</span>
+                <span class="text-pine/60">→</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,150 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import ArticleCard from "../../components/ArticleCard.astro";
+
+const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
+  (a, b) => new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime()
+);
+
+const categorySummary = [
+  {
+    label: "Fitness",
+    description: "Body metrics, metabolism, training, and body composition topics."
+  },
+  {
+    label: "Nutrition",
+    description: "Calories, macros, fiber, meal planning, and everyday eating questions."
+  },
+  {
+    label: "Pregnancy",
+    description: "Due dates, ovulation, weight gain, and common pregnancy planning questions."
+  },
+  {
+    label: "Health",
+    description: "Sleep, hydration, blood pressure, heart rate, and everyday health topics."
+  }
+];
+
+const editorialPrinciples = [
+  {
+    title: "Explain what the number means",
+    description: "The articles focus on the interpretation, not just the formula or definition."
+  },
+  {
+    title: "Keep the writing concise",
+    description: "Most readers want the answer quickly, so the sections stay short and readable."
+  },
+  {
+    title: "Link to the next page",
+    description: "Each guide points to the calculator or follow-up article people usually need next."
+  }
+];
+---
+
+<BaseLayout title="HealthCalcHub Blog - Health Articles and Calculator Guides" description="Health articles that explain BMI, calories, sleep, pregnancy, hydration, blood pressure, and other everyday health topics.">
+  <section class="section-shell brand-frame soft-grid overflow-hidden p-8 sm:p-10">
+    <div class="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+      <div>
+        <div class="flex flex-wrap gap-2">
+          <span class="eyebrow">Blog</span>
+          <span class="wellness-chip">Articles that explain the numbers</span>
+        </div>
+        <h1 class="heading-display mt-5">Health articles that make the numbers easier to understand.</h1>
+        <p class="mt-5 max-w-3xl text-lg leading-8 text-ink/74">
+          Read short guides on BMI, calories, sleep, fertility, hydration, blood pressure, and related topics. Each one is written to help you understand the result before or after using a calculator.
+        </p>
+        <div class="mt-7 flex flex-wrap gap-3">
+          <span class="trust-pill"><span class="info-dot"></span>{posts.length} published articles</span>
+          <span class="trust-pill"><span class="info-dot"></span>Linked to calculator pages</span>
+          <span class="trust-pill"><span class="info-dot"></span>Focused on common questions</span>
+        </div>
+      </div>
+      <div class="editorial-support-grid">
+        {categorySummary.map((item) => (
+          <div class="editorial-support-card">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine">{item.label}</p>
+            <p class="mt-3 text-lg font-bold text-ink">{item.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="mt-10 journey-grid">
+    <div class="editorial-spotlight brand-frame">
+      <span class="eyebrow">Why These Guides Help</span>
+      <h2 class="mt-4 font-serif text-4xl text-ink">A simpler way to read health topics that are often explained poorly.</h2>
+      <p class="mt-4 max-w-2xl text-sm leading-8 text-ink/72">
+        The goal is simple: explain the topic clearly, point out common misunderstandings, and help you choose the right calculator.
+      </p>
+      <div class="editorial-meta-grid">
+        <div class="editorial-meta-card">
+          <p class="text-xs uppercase tracking-[0.16em] text-pine">Published guides</p>
+          <p class="mt-2 text-2xl font-black text-ink">{posts.length}</p>
+        </div>
+        <div class="editorial-meta-card">
+          <p class="text-xs uppercase tracking-[0.16em] text-pine">Topic groups</p>
+          <p class="mt-2 text-2xl font-black text-ink">4</p>
+        </div>
+        <div class="editorial-meta-card">
+          <p class="text-xs uppercase tracking-[0.16em] text-pine">What to expect</p>
+          <p class="mt-2 text-sm font-bold leading-6 text-ink">Clear explanations, short sections, and relevant links</p>
+        </div>
+      </div>
+    </div>
+    <div class="journey-card brand-frame">
+      <span class="eyebrow">How These Guides Work</span>
+      <div class="mt-6 space-y-4">
+        {editorialPrinciples.map((item, index) => (
+          <div class="timeline-row">
+            <div class="timeline-dot">{`0${index + 1}`}</div>
+            <div>
+              <p class="text-sm font-bold text-ink">{item.title}</p>
+              <p class="mt-1 text-sm leading-6 text-ink/68">{item.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="mt-10">
+    <div class="section-hero-split mb-6">
+      <div>
+        <span class="eyebrow">Topic Library</span>
+        <h2 class="mt-4 font-serif text-4xl text-ink">Browse health topics by the question you are trying to answer</h2>
+      </div>
+      <div class="section-intro-card max-w-2xl">
+        <p class="text-sm leading-7 text-ink/70">
+          These groups keep the blog organized around the kinds of health questions people actually look up.
+        </p>
+      </div>
+    </div>
+    <div class="topic-pill-grid">
+      {categorySummary.map((item) => (
+        <div class="topic-pill-card">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine">{item.label}</p>
+          <p class="mt-3 text-sm leading-7 text-ink/72">{item.description}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="mt-10">
+    <div class="section-hero-split mb-6">
+      <div>
+        <span class="eyebrow">Latest Reading</span>
+        <h2 class="mt-4 font-serif text-4xl text-ink">Recent articles organized around common questions</h2>
+      </div>
+      <div class="section-intro-card max-w-2xl">
+        <p class="text-sm leading-7 text-ink/70">
+          Start with the question you have, read the main explanation, then move to the calculator or related guide that fits best.
+        </p>
+      </div>
+    </div>
+    <div class="grid gap-5 md:grid-cols-2">
+      {posts.map((post) => <ArticleCard post={post} />)}
+    </div>
+  </section>
+</BaseLayout>

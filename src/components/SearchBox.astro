@@ -1,0 +1,132 @@
+---
+import { calculators, categoryLabels } from "../data/calculators";
+import { getCollection } from "astro:content";
+import { withBasePath } from "../utils/site";
+
+type Props = {
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+  placeholder?: string;
+  suggestedQueries?: string[];
+};
+
+const {
+  eyebrow = "Search",
+  title = "Find the right tool or guide in one search",
+  description = "Search by topic, goal, or tool name and jump straight to the page you need.",
+  placeholder = "Search BMI, calories, ovulation, hydration...",
+  suggestedQueries = ["BMI", "Calorie", "Macro", "Ovulation", "Sleep", "Blood pressure"]
+} = Astro.props;
+
+const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
+  (a, b) => new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime()
+);
+const recommendedCalculators = ["bmi-calculator", "calorie-calculator", "macro-calculator", "sleep-calculator"]
+  .map((slug) => calculators.find((calculator) => calculator.slug === slug))
+  .filter(Boolean);
+const recommendedPages = [
+  ...recommendedCalculators.map((calculator) => ({
+    title: calculator!.title,
+    url: withBasePath(`/${calculator!.slug}`),
+    type: "Calculator"
+  })),
+  ...posts.slice(0, 3).map((post) => ({
+    title: post.data.title,
+    url: withBasePath(`/blog/${post.slug}`),
+    type: "Article"
+  }))
+];
+const searchIndex = [
+  ...calculators.map((calculator) => ({
+    title: calculator.title,
+    description: calculator.description,
+    url: withBasePath(`/${calculator.slug}`),
+    type: "Calculator",
+    category: categoryLabels[calculator.category],
+    keywords: [calculator.title, calculator.cardBlurb, calculator.intro, calculator.description, categoryLabels[calculator.category]].join(" ")
+  })),
+  ...posts.map((post) => ({
+    title: post.data.title,
+    description: post.data.description,
+    url: withBasePath(`/blog/${post.slug}`),
+    type: "Article",
+    category: `${post.data.category.charAt(0).toUpperCase()}${post.data.category.slice(1)}`,
+    keywords: [...post.data.tags, ...post.data.relatedCalculators].join(" ")
+  }))
+];
+---
+
+<section class="section-shell brand-frame p-6 sm:p-8" data-search-index={JSON.stringify(searchIndex)}>
+  <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div>
+      <span class="eyebrow">{eyebrow}</span>
+      <h2 class="mt-4 font-serif text-3xl text-ink">{title}</h2>
+      <p class="mt-3 max-w-2xl text-sm leading-7 text-ink/68">{description}</p>
+    </div>
+    <div class="w-full max-w-xl">
+      <form action={withBasePath("/search")} data-site-search-form class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <input type="hidden" name="type" value="all" data-search-type-input />
+        <label class="flex flex-1 items-center rounded-full border border-white/80 bg-white/95 px-5 py-4 shadow-float">
+          <input
+            id="site-search-input"
+            name="q"
+            type="search"
+            placeholder={placeholder}
+            class="w-full bg-transparent text-sm text-ink outline-none"
+          />
+        </label>
+        <button type="submit" class="inline-flex shrink-0 justify-center rounded-full bg-pine px-6 py-3 text-sm font-bold text-white shadow-float">
+          Search
+        </button>
+      </form>
+    </div>
+  </div>
+  <div class="mt-4 flex flex-wrap gap-2">
+    {suggestedQueries.map((query) => (
+      <a href={withBasePath(`/search?q=${encodeURIComponent(query)}`)} class="wellness-chip" data-search-suggestion={query}>
+        {query}
+      </a>
+    ))}
+  </div>
+  <div class="mt-5 flex flex-wrap gap-2" role="tablist" aria-label="Search result filters">
+    <button type="button" class="search-filter-chip search-filter-chip-active" data-search-filter="all">All Results</button>
+    <button type="button" class="search-filter-chip" data-search-filter="calculator">Calculators</button>
+    <button type="button" class="search-filter-chip" data-search-filter="article">Articles</button>
+  </div>
+  <p data-site-search-summary class="mt-5 text-sm leading-7 text-ink/62">
+    Search by tool name, health topic, or a question you want to look up.
+  </p>
+  <div data-site-search-empty class="search-empty-state mt-6 grid gap-4 lg:grid-cols-[0.92fr_1.08fr]">
+    <div class="search-empty-card">
+      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine/72">Popular Searches</p>
+      <div class="mt-4 flex flex-wrap gap-2">
+        {suggestedQueries.map((query) => (
+          <a href={withBasePath(`/search?q=${encodeURIComponent(query)}`)} class="trust-pill" data-search-suggestion={query}>
+            <span class="info-dot"></span>
+            {query}
+          </a>
+        ))}
+      </div>
+    </div>
+    <div class="search-empty-card">
+      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine/72">Start Here</p>
+      <div class="mt-4 grid gap-3 sm:grid-cols-2">
+        {recommendedPages.map((page) => (
+          <a href={page.url} class="path-link">
+            <span>
+              <span class="block text-[11px] font-semibold uppercase tracking-[0.14em] text-pine/68">{page.type}</span>
+              <span class="mt-1 block text-sm font-semibold text-ink">{page.title}</span>
+            </span>
+            <span class="site-nav-arrow">→</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+  <div id="site-search-results" class="mt-6 grid gap-4 md:grid-cols-2"></div>
+</section>
+
+<script>
+  import "../scripts/search-box";
+</script>

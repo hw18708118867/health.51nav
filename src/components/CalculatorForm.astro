@@ -1,0 +1,295 @@
+---
+import type { CalculatorConfig, FieldDefinition, UnitSystem } from "../types/calculator";
+import ToolIcon from "./ToolIcon.astro";
+import { withBasePath } from "../utils/site";
+
+type Props = {
+  calculator: CalculatorConfig;
+  quickSwitchPrimary?: CalculatorConfig[];
+  quickSwitchGroups?: Array<{
+    key: string;
+    label: string;
+    items: CalculatorConfig[];
+  }>;
+  currentCategoryLabel?: string;
+};
+
+const { calculator } = Astro.props;
+const {
+  quickSwitchPrimary = [],
+  quickSwitchGroups = [],
+  currentCategoryLabel = "Calculator"
+} = Astro.props;
+
+const defaultUnitSystem = calculator.unitSystems?.[0] ?? "metric";
+const currentGroup = quickSwitchGroups.find((group) => group.key === calculator.category);
+const compactSwitchItems = quickSwitchPrimary.slice(0, 4);
+const nearbyCategoryItems = currentGroup?.items.slice(0, 5) ?? [];
+const quickSwitchId = `quick-switch-panel-${calculator.slug}`;
+const categoryLabelMap = new Map(quickSwitchGroups.map((group) => [group.key, group.label]));
+
+const isVisibleForUnit = (field: FieldDefinition, unitSystem: UnitSystem) =>
+  !field.unitSystems || field.unitSystems.includes(unitSystem);
+---
+
+<section
+  transition:name="calculator-workspace"
+  class="section-shell brand-frame p-6 sm:p-8"
+  id="calculator"
+  data-calculator-config={JSON.stringify(calculator)}
+  data-calculator-slug={calculator.slug}
+  data-quick-switch-root
+>
+  <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+    <div class="max-w-2xl">
+      <span class="eyebrow">Calculator</span>
+      <h2 class="section-title mt-4">Try {calculator.title}</h2>
+      <p class="mt-3 max-w-2xl text-sm leading-7 text-ink/68">Enter your details to get an estimate, then read the notes below for context.</p>
+      <div class="mobile-pill-row mt-4 sm:flex sm:flex-wrap sm:overflow-visible sm:pb-0 sm:gap-2">
+        <span class="trust-pill"><span class="info-dot"></span>Fast estimate</span>
+        <span class="trust-pill"><span class="info-dot"></span>Clear result notes</span>
+        <span class="trust-pill"><span class="info-dot"></span>No sign-up needed</span>
+      </div>
+    </div>
+    <div class="calculator-toolbar">
+      <button
+        type="button"
+        class="quick-switch-trigger"
+        data-quick-switch-toggle
+        data-quick-switch-target={quickSwitchId}
+        aria-expanded="false"
+        aria-controls={quickSwitchId}
+      >
+        <span class="quick-switch-trigger-copy">
+          <span class="quick-switch-trigger-label">Quick Switch</span>
+          <span class="quick-switch-trigger-hint">{currentCategoryLabel} and nearby tools</span>
+        </span>
+        <span class="quick-switch-trigger-badge">{compactSwitchItems.length + nearbyCategoryItems.length}+</span>
+      </button>
+      {calculator.unitSystems && calculator.unitSystems.length > 1 && (
+        <div class="quick-switch-unit-toggle inline-flex w-full justify-center rounded-full border border-white/80 bg-white/95 p-1 shadow-float sm:w-auto sm:justify-start">
+          {calculator.unitSystems.map((unit) => (
+            <button
+              type="button"
+              class={`unit-toggle min-w-[7rem] rounded-full px-4 py-2 text-sm font-semibold transition sm:min-w-0 ${
+                unit === defaultUnitSystem ? "bg-pine text-white" : "text-ink/65"
+              }`}
+              data-unit-toggle={unit}
+            >
+              {unit === "metric" ? "Metric" : "Imperial"}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+
+  <div class="quick-switch-popout-shell">
+    <button type="button" class="quick-switch-backdrop" data-quick-switch-backdrop hidden aria-label="Close quick switch"></button>
+    <div id={quickSwitchId} class="quick-switch-popout" data-quick-switch-panel data-quick-switch-current={calculator.slug} hidden>
+      <div class="quick-switch-popout-head">
+        <div class="flex items-center gap-3">
+          <ToolIcon slug={calculator.slug} size="sm" label={calculator.title} />
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine/72">Current tool</p>
+            <p class="mt-1 text-base font-bold text-ink">{calculator.title}</p>
+          </div>
+        </div>
+        <button type="button" class="quick-switch-close" data-quick-switch-close aria-label="Close quick switch">
+          Close
+        </button>
+      </div>
+
+      <div data-quick-switch-recent-shell class="quick-switch-popout-section hidden">
+        <div class="flex items-center justify-between gap-3">
+          <p class="quick-switch-popout-label">Recently opened</p>
+          <span class="text-[11px] font-semibold uppercase tracking-[0.14em] text-pine/56">Private to this browser</span>
+        </div>
+        <div data-quick-switch-recent class="quick-switch-popout-pills mt-3"></div>
+      </div>
+
+      {compactSwitchItems.length > 0 && (
+        <div class="quick-switch-popout-section">
+          <p class="quick-switch-popout-label">Closest next</p>
+          <div class="quick-switch-popout-grid">
+            {compactSwitchItems.map((item) => (
+              <a href={withBasePath(`/${item.slug}#calculator`)} class="quick-switch-card-mini" data-calculator-switch-link>
+                <span class="quick-switch-card-mini-copy">
+                  <ToolIcon slug={item.slug} size="sm" />
+                    <span>
+                      <span class="block text-sm font-bold text-ink">{item.title}</span>
+                      <span class="mt-1 block text-[11px] uppercase tracking-[0.14em] text-pine/62">{categoryLabelMap.get(item.category) ?? item.category}</span>
+                    </span>
+                  </span>
+                <span class="site-nav-arrow">→</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {nearbyCategoryItems.length > 0 && (
+        <div class="quick-switch-popout-section quick-switch-popout-section-soft">
+          <p class="quick-switch-popout-label">More in {currentCategoryLabel}</p>
+          <div class="quick-switch-popout-pills">
+            {nearbyCategoryItems.map((item) => (
+              <a href={withBasePath(`/${item.slug}#calculator`)} class="quick-switch-pill-compact" data-calculator-switch-link>
+                <ToolIcon slug={item.slug} size="sm" />
+                <span>{item.title}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div class="quick-switch-popout-section">
+        <p class="quick-switch-popout-label">Browse by category</p>
+        <div class="space-y-4">
+          {quickSwitchGroups.map((group) => (
+            <div class="quick-switch-category-block">
+              <div class="flex items-center justify-between gap-3">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-pine/64">{group.label}</p>
+                <span class="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink/44">{group.items.length} tools</span>
+              </div>
+              <div class="quick-switch-popout-pills mt-3">
+                {group.items.map((item) => (
+                  <a href={withBasePath(`/${item.slug}#calculator`)} class="quick-switch-pill-compact" data-calculator-switch-link>
+                    <ToolIcon slug={item.slug} size="sm" />
+                    <span>{item.title}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="calculator-shell-grid">
+    <div class="surface-card calculator-input-stage p-5 sm:p-6">
+      <div class="mb-5 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine/72">Inputs</p>
+          <p class="mt-2 text-lg font-bold text-ink">Enter your details</p>
+        </div>
+        <div class="tinted-panel tinted-panel-sage w-full px-4 py-3 text-sm leading-6 text-ink/72 sm:w-auto">
+          Most people finish this in under a minute.
+        </div>
+      </div>
+      <form id="calculator-form" class="grid gap-5 md:grid-cols-2">
+        <input type="hidden" name="unitSystem" value={defaultUnitSystem} />
+        {calculator.fields.map((field) => (
+          <label
+            class="field field-shell"
+            data-field-name={field.name}
+            data-unit-systems={field.unitSystems?.join(",") ?? ""}
+            data-show-when-field={field.showWhen?.field ?? ""}
+            data-show-when-value={field.showWhen?.equals ?? ""}
+            style={isVisibleForUnit(field, defaultUnitSystem) ? "" : "display:none"}
+          >
+            <span class="text-sm font-semibold text-ink/82">{field.label}</span>
+            {field.type === "select" ? (
+              <select name={field.name} class="field-input">
+                {field.options?.map((option) => (
+                  <option value={option.value} selected={String(field.defaultValue) === option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <div class="field-inline-input">
+                <input
+                  type={field.type}
+                  name={field.name}
+                  min={field.min}
+                  max={field.max}
+                  step={field.step}
+                  value={String(field.defaultValue ?? "")}
+                  placeholder={field.placeholder}
+                  class="w-full bg-transparent text-ink outline-none"
+                />
+                {field.suffix && <span class="ml-2 text-sm text-ink/45">{field.suffix}</span>}
+              </div>
+            )}
+            {field.helper && <span class="text-xs leading-6 text-ink/55">{field.helper}</span>}
+          </label>
+        ))}
+        <div class="calculator-submit-ribbon md:col-span-2 flex flex-col items-start gap-3 rounded-[1.6rem] bg-mint/65 px-4 py-4 sm:flex-row sm:items-center">
+          <button
+            type="submit"
+            class="calculator-submit-button inline-flex w-full justify-center rounded-full bg-pine px-6 py-3 text-sm font-bold text-white shadow-float transition hover:translate-y-[-1px] hover:bg-pine/92 sm:w-auto"
+          >
+            Calculate
+          </button>
+          <p class="text-xs uppercase tracking-[0.14em] text-ink/50">Your result updates instantly in the panel on the right.</p>
+        </div>
+      </form>
+    </div>
+
+    <div
+      id="calculator-result"
+      data-result-stage
+      data-result-state="idle"
+      class="result-stage result-stage-energy rounded-[2rem] px-5 py-5 text-white shadow-panel sm:px-6 sm:py-6"
+    >
+      <div data-result-animate="chrome" class="flex items-center justify-between gap-3">
+        <p class="text-sm font-semibold uppercase tracking-[0.18em] text-white/85">Result</p>
+        <span class="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/78">Quick interpretation</span>
+      </div>
+      <div data-result-animate="primary" class="mt-4 flex items-start justify-between gap-4">
+        <div class="flex-1">
+          <div data-result-badge class="result-badge">Waiting for input</div>
+          <p class="mt-4 text-2xl font-bold leading-tight sm:text-3xl" data-result-summary>Enter your details and click calculate.</p>
+        </div>
+        <div class="hidden md:block">
+          <ToolIcon slug={calculator.slug} size="lg" label={calculator.title} />
+        </div>
+      </div>
+      <p data-result-animate="support" class="mt-3 text-sm leading-7 text-white/78">This panel shows the main result first, followed by any extra details that matter.</p>
+      <div data-result-animate="signals" class="signal-grid" data-result-signals>
+        <div class="signal-panel">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/66">Primary signal</p>
+          <p class="mt-2 text-sm leading-6 text-white/90">Your main number or category will appear here after calculation.</p>
+        </div>
+        <div class="signal-panel">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/66">What to look at next</p>
+          <p class="mt-2 text-sm leading-6 text-white/90">Check the range, category, or comparison details instead of relying on one number alone.</p>
+        </div>
+      </div>
+      <div data-result-animate="meter" class="result-meter">
+        <div class="flex items-center justify-between gap-3">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-white/68">Estimate scale</p>
+          <span data-result-meter-label class="signal-chip">Estimate</span>
+        </div>
+        <div class="result-meter-track">
+          <div data-result-meter-fill class="result-meter-fill" style="width: 34%"></div>
+        </div>
+      </div>
+      <div data-result-animate="visual" data-result-visual class="result-visual-board">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-white/66">Focused view</p>
+        <p class="mt-2 text-sm leading-6 text-white/88">Some calculators also show a visual summary here after calculation.</p>
+      </div>
+      <div data-result-animate="guidance" class="mt-5 grid gap-3 sm:grid-cols-2">
+        <div class="insight-card">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/68">Step 1</p>
+          <p class="mt-2 text-sm leading-6 text-white/90">Start with the main number, then check the range or category around it.</p>
+        </div>
+        <div class="insight-card">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/68">Step 2</p>
+          <p class="mt-2 text-sm leading-6 text-white/90">Use the sections below if you want formulas, ranges, or related tools.</p>
+        </div>
+      </div>
+      <div id="calculator-result-details" data-result-animate="details" data-result-details class="mt-5 grid gap-3 sm:grid-cols-2"></div>
+      <p id="calculator-result-note" data-result-animate="note" data-result-note class="mt-4 rounded-2xl bg-white/10 px-4 py-3 text-sm text-white/82"></p>
+      <div data-result-animate="tips" class="mt-4 rounded-[1.5rem] bg-white/10 px-4 py-4">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-white/66">Notes to keep in mind</p>
+        <ul id="calculator-result-tips" data-result-tips class="mt-3 list-disc space-y-2 pl-5 text-sm text-white/85"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import "../scripts/calculator-form";
+</script>

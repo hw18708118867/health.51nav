@@ -1,0 +1,29 @@
+---
+import { calculators } from "../data/calculators";
+import { withBasePath } from "../utils/site";
+
+const suggestions = calculators.slice(0, 6).map((calculator) => ({
+  slug: calculator.slug,
+  title: calculator.title,
+  url: withBasePath(`/${calculator.slug}`),
+  category: calculator.category
+}));
+---
+
+<section class="section-shell brand-frame p-6 sm:p-8" data-recent-tools data-suggestions={JSON.stringify(suggestions)}>
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <span class="eyebrow">Recently Used</span>
+      <h2 class="mt-4 font-serif text-4xl text-ink">Pick up where you left off</h2>
+      <p class="mt-3 max-w-2xl text-sm leading-7 text-ink/68">
+        Your recent calculator visits stay on this device, so you can come back to a tool without searching for it again.
+      </p>
+    </div>
+    <span class="wellness-chip">Private to this browser</span>
+  </div>
+  <div data-recent-tools-list class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3"></div>
+</section>
+
+<script>
+  import "../scripts/recent-tools";
+</script>

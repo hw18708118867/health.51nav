@@ -1,0 +1,57 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Contact - HealthCalcHub"
+  description="Contact HealthCalcHub for feedback, corrections, or general questions."
+>
+  <section class="section-shell brand-frame soft-grid overflow-hidden p-8 sm:p-10">
+    <div class="grid gap-8 lg:grid-cols-[1.04fr_0.96fr] lg:items-start">
+      <div>
+        <div class="flex flex-wrap gap-2">
+          <span class="eyebrow">Contact</span>
+          <span class="wellness-chip">Questions and feedback</span>
+        </div>
+        <h1 class="heading-display mt-5">Get in touch with HealthCalcHub.</h1>
+        <p class="mt-5 max-w-3xl text-lg leading-8 text-ink/74">
+          If you spot an error, want to suggest a calculator, or have a general question about the site, email is the best way to reach us.
+        </p>
+        <div class="mt-7 flex flex-wrap gap-3">
+          <span class="trust-pill"><span class="info-dot"></span>Feedback welcome</span>
+          <span class="trust-pill"><span class="info-dot"></span>Calculator suggestions</span>
+          <span class="trust-pill"><span class="info-dot"></span>Content corrections</span>
+        </div>
+      </div>
+      <div class="section-intro-card">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine/72">Email</p>
+        <a
+          href="mailto:miraclehuang611@gmail.com"
+          class="mt-4 inline-flex rounded-full bg-pine px-5 py-3 text-sm font-bold text-white shadow-float hover:bg-pine/92"
+        >
+          miraclehuang611@gmail.com
+        </a>
+        <p class="mt-4 text-sm leading-7 text-ink/72">
+          Please do not send urgent medical questions. HealthCalcHub is an educational website and cannot provide personal medical advice.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mt-10 grid gap-5 md:grid-cols-2">
+    <div class="surface-card brand-frame p-6">
+      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine">Good reasons to reach out</p>
+      <ul class="mt-4 space-y-3 text-sm leading-7 text-ink/72">
+        <li>Report a typo, outdated detail, or unclear explanation.</li>
+        <li>Suggest a new calculator or article topic.</li>
+        <li>Share general feedback about usability or design.</li>
+      </ul>
+    </div>
+    <div class="surface-card brand-frame p-6">
+      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine">Before emailing</p>
+      <p class="mt-4 text-sm leading-7 text-ink/72">
+        For personal health decisions, it is always better to confirm important information with a qualified healthcare professional who knows your situation.
+      </p>
+    </div>
+  </section>
+</BaseLayout>

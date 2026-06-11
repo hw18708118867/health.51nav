@@ -1,0 +1,61 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SearchBox from "../components/SearchBox.astro";
+---
+
+<BaseLayout
+  title="Search Health Calculators and Articles - HealthCalcHub"
+  description="Search HealthCalcHub calculators and health guides by topic, goal, or tool name."
+  robots="noindex,follow"
+>
+  <section class="section-shell brand-frame soft-grid overflow-hidden p-8 sm:p-10">
+    <div class="grid gap-8 lg:grid-cols-[1.06fr_0.94fr] lg:items-start">
+      <div>
+        <div class="flex flex-wrap gap-2">
+          <span class="eyebrow">Search</span>
+          <span class="wellness-chip">Find tools and articles quickly</span>
+        </div>
+        <h1 class="heading-display mt-5">Search calculators and health guides from one place.</h1>
+        <p class="mt-5 max-w-3xl text-lg leading-8 text-ink/74">
+          Search BMI, calories, macros, ovulation, hydration, sleep, blood pressure, and related articles without digging through menus.
+        </p>
+        <div class="mt-7 flex flex-wrap gap-3">
+          <span class="trust-pill"><span class="info-dot"></span>Search calculators</span>
+          <span class="trust-pill"><span class="info-dot"></span>Search blog articles</span>
+          <span class="trust-pill"><span class="info-dot"></span>Jump straight to the page you need</span>
+        </div>
+      </div>
+      <div class="section-intro-card">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine/72">Good things to search</p>
+        <div class="mt-4 grid gap-3 sm:grid-cols-2">
+          <div class="tinted-panel tinted-panel-sage px-4 py-4">
+            <p class="text-sm font-bold text-ink">Body goals</p>
+            <p class="mt-2 text-sm leading-7 text-ink/72">BMI, calorie, macro, protein, ideal weight.</p>
+          </div>
+          <div class="tinted-panel tinted-panel-sky px-4 py-4">
+            <p class="text-sm font-bold text-ink">Nutrition topics</p>
+            <p class="mt-2 text-sm leading-7 text-ink/72">Carbs, fat, fiber, meal calories, water intake.</p>
+          </div>
+          <div class="tinted-panel tinted-panel-coral px-4 py-4">
+            <p class="text-sm font-bold text-ink">Pregnancy planning</p>
+            <p class="mt-2 text-sm leading-7 text-ink/72">Ovulation, due date, pregnancy weight gain.</p>
+          </div>
+          <div class="tinted-panel px-4 py-4">
+            <p class="text-sm font-bold text-ink">Health signals</p>
+            <p class="mt-2 text-sm leading-7 text-ink/72">Sleep, blood pressure, heart rate, BAC.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mt-10">
+    <SearchBox
+      eyebrow="Search Results"
+      title="Type a topic, tool name, or health question"
+      description="Results update as you type and include both calculators and articles."
+      placeholder="Search BMI, meal calories, pregnancy, sleep, fiber..."
+      suggestedQueries={["BMI", "TDEE", "Meal calories", "Ovulation", "Water intake", "Sleep"]}
+    />
+  </section>
+</BaseLayout>

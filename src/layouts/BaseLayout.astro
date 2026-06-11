@@ -1,0 +1,259 @@
+---
+import "../styles/global.css";
+import { ClientRouter } from "astro:transitions";
+import { calculators, categoryLabels } from "../data/calculators";
+import CategoryIcon from "../components/CategoryIcon.astro";
+import ToolIcon from "../components/ToolIcon.astro";
+import { resolveSiteUrl, stripBasePath, withBasePath } from "../utils/site";
+
+type Props = {
+  title: string;
+  description: string;
+  canonical?: string;
+  image?: string;
+  jsonLd?: Array<Record<string, unknown>>;
+  robots?: string;
+};
+
+const {
+  title,
+  description,
+  canonical = Astro.url.href,
+  image = "/social-cover.svg",
+  jsonLd = [],
+  robots
+} = Astro.props;
+
+const currentPath = stripBasePath(Astro.url.pathname.replace(/\/$/, "") || "/");
+const currentCalculator = calculators.find((calculator) => `/${calculator.slug}` === currentPath);
+const activeCategory = currentCalculator?.category ?? null;
+const isBlogPage = currentPath === "/blog" || currentPath.startsWith("/blog/");
+const isCalculatorsPage = currentPath === "/calculators";
+const isSearchPage = currentPath === "/search";
+const analyticsMeasurementId = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID?.trim() ?? "";
+const googleSiteVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION?.trim() ?? "";
+const canonicalUrl = /^https?:/i.test(canonical) ? canonical : resolveSiteUrl(canonical, Astro.site);
+const socialImageUrl = resolveSiteUrl(image, Astro.site);
+
+const navGroups = Object.entries(categoryLabels).map(([key, label]) => ({
+  key,
+  label,
+  items: calculators.filter((calculator) => calculator.category === key)
+}));
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="icon" href={withBasePath("/favicon.ico")} sizes="any" />
+    <link rel="icon" type="image/svg+xml" href={withBasePath("/favicon.svg")} />
+    <link rel="apple-touch-icon" href={withBasePath("/favicon.png")} />
+    <link rel="sitemap" type="application/xml" href={withBasePath("/sitemap-index.xml")} />
+    <meta name="theme-color" content="#1f5d57" />
+    {robots && <meta name="robots" content={robots} />}
+    {robots && <meta name="googlebot" content={robots} />}
+    {googleSiteVerification && <meta name="google-site-verification" content={googleSiteVerification} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="HealthCalcHub" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={socialImageUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImageUrl} />
+    {
+      analyticsMeasurementId && (
+        <>
+          <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${analyticsMeasurementId}`}></script>
+          <script is:inline define:vars={{ analyticsMeasurementId }}>
+            window.dataLayer = window.dataLayer || [];
+            window.gtag =
+              window.gtag ||
+              function gtag() {
+                window.dataLayer.push(arguments);
+              };
+
+            const trackPageView = () => {
+              const nextPath = `${window.location.pathname}${window.location.search}`;
+              if (window.__healthCalcHubLastTrackedPath === nextPath) return;
+
+              window.__healthCalcHubLastTrackedPath = nextPath;
+              window.gtag?.("event", "page_view", {
+                page_title: document.title,
+                page_location: window.location.href,
+                page_path: nextPath
+              });
+            };
+
+            window.gtag("js", new Date());
+            window.gtag("config", analyticsMeasurementId, {
+              send_page_view: false
+            });
+
+            if (document.readyState === "loading") {
+              document.addEventListener("DOMContentLoaded", trackPageView, { once: true });
+            } else {
+              trackPageView();
+            }
+
+            document.addEventListener("astro:page-load", trackPageView);
+          </script>
+        </>
+      )
+    }
+    <ClientRouter fallback="animate" />
+    {jsonLd.map((item) => <script is:inline type="application/ld+json" set:html={JSON.stringify(item)} />)}
+  </head>
+  <body class="min-h-screen">
+    <div class="halo-orb left-[-5rem] top-[6rem] h-40 w-40 bg-sage/20"></div>
+    <div class="halo-orb right-[4rem] top-[10rem] h-52 w-52 bg-sky/80"></div>
+    <div class="mx-auto flex min-h-screen max-w-7xl flex-col px-4 pb-16 pt-6 sm:px-6 lg:px-8">
+      <header class="relative z-[80] mb-8">
+        <div class="site-header-shell section-shell brand-frame">
+        <div class="site-header-ribbon">
+            <p>Health calculators and articles</p>
+            <p>BMI, nutrition, pregnancy, and daily health</p>
+          </div>
+          <div class="grid gap-5 px-5 py-5 sm:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+            <a href={withBasePath("/")} class="flex items-start gap-4 text-ink">
+              <span class="brand-mark">
+                <span class="brand-mark-core">H</span>
+              </span>
+              <span>
+                <span class="block text-lg font-extrabold tracking-tight">HealthCalcHub</span>
+                <span class="block text-sm text-ink/68">Health calculators and articles for everyday questions</span>
+                <span class="mt-3 flex flex-wrap gap-2">
+                  <span class="site-stat-chip">BMI, calories, sleep</span>
+                  <span class="site-stat-chip">Pregnancy, nutrition, wellness</span>
+                  <span class="site-stat-chip">No sign-up needed</span>
+                </span>
+              </span>
+            </a>
+            <div class="lg:hidden">
+              <details class="mobile-nav-shell">
+                <summary class="mobile-nav-toggle">
+                  <span class="mobile-nav-toggle-label">Menu</span>
+                  <span class="mobile-nav-toggle-icon" aria-hidden="true">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </span>
+                </summary>
+                <div class="mobile-nav-panel">
+                  <a href={withBasePath("/calculators")} class={`mobile-nav-link ${isCalculatorsPage ? "mobile-nav-link-active" : ""}`}>
+                    <span>All Calculators</span>
+                    <span class="site-nav-arrow">→</span>
+                  </a>
+                  {navGroups.map((group) => (
+                    <details class="mobile-nav-group" open={activeCategory === group.key}>
+                      <summary class={`mobile-nav-group-summary ${activeCategory === group.key ? "mobile-nav-group-summary-active" : ""}`}>
+                        <span class="mobile-nav-group-label">
+                          <CategoryIcon category={group.key as "fitness" | "nutrition" | "pregnancy" | "health"} size="sm" />
+                          <span>{group.label}</span>
+                        </span>
+                        <span class="mobile-nav-caret">⌄</span>
+                      </summary>
+                      <div class="mobile-nav-group-list">
+                        <a href={withBasePath(`/calculators#${group.key}`)} class="mobile-nav-link mobile-nav-link-soft">
+                          <span>View all {group.label}</span>
+                          <span class="site-nav-arrow">→</span>
+                        </a>
+                        {group.items.map((item) => (
+                          <a href={withBasePath(`/${item.slug}`)} class={`mobile-nav-link mobile-nav-link-soft ${currentPath === `/${item.slug}` ? "mobile-nav-link-active" : ""}`}>
+                            <span class="site-nav-dropdown-copy">
+                              <ToolIcon slug={item.slug} size="sm" />
+                              <span>{item.title}</span>
+                            </span>
+                            <span class="site-nav-arrow">→</span>
+                          </a>
+                        ))}
+                      </div>
+                    </details>
+                  ))}
+                  <a href={withBasePath("/blog")} class={`mobile-nav-link ${isBlogPage ? "mobile-nav-link-active" : ""}`}>
+                    <span>Blog</span>
+                    <span class="site-nav-arrow">→</span>
+                  </a>
+                  <a href={withBasePath("/search")} class={`mobile-nav-link ${isSearchPage ? "mobile-nav-link-active" : ""}`}>
+                    <span>Search</span>
+                    <span class="site-nav-arrow">→</span>
+                  </a>
+                </div>
+              </details>
+            </div>
+            <nav class="site-nav hidden lg:flex">
+              <a href={withBasePath("/calculators")} class={`site-nav-link ${isCalculatorsPage ? "site-nav-link-active" : ""}`}>All Calculators</a>
+              {navGroups.map((group) => (
+                <div class="site-nav-group">
+                  <a
+                    href={withBasePath(`/calculators#${group.key}`)}
+                    class={`site-nav-link ${activeCategory === group.key ? "site-nav-link-active" : ""}`}
+                  >
+                    <CategoryIcon category={group.key as "fitness" | "nutrition" | "pregnancy" | "health"} size="sm" />
+                    {group.label}
+                  </a>
+                  <div class="site-nav-dropdown">
+                    <div class="site-nav-dropdown-shell">
+                      <p class="site-nav-dropdown-title">{group.label}</p>
+                      <div class="site-nav-dropdown-list">
+                        {group.items.map((item) => (
+                          <a href={withBasePath(`/${item.slug}`)} class="site-nav-dropdown-link">
+                            <span class="site-nav-dropdown-copy">
+                              <ToolIcon slug={item.slug} size="sm" />
+                              <span>{item.title}</span>
+                            </span>
+                            <span class="site-nav-arrow">→</span>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <a href={withBasePath("/blog")} class={`site-nav-link ${isBlogPage ? "site-nav-link-active" : ""}`}>Blog</a>
+              <a href={withBasePath("/search")} class={`site-nav-link ${isSearchPage ? "site-nav-link-active" : ""}`}>Search</a>
+            </nav>
+          </div>
+        </div>
+      </header>
+      <main class="flex-1">
+        <slot />
+      </main>
+      <footer class="mt-12">
+        <div class="section-shell brand-frame px-6 py-6 text-sm text-ink/68">
+          <div class="grid gap-6 lg:grid-cols-[1.2fr_0.8fr_0.8fr]">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine/75">HealthCalcHub</p>
+              <p class="mt-3 max-w-2xl leading-7">
+                HealthCalcHub brings together calculators and supporting articles for common health questions. You can check a number, read what it means, and move to the next page without digging through several sites. It is for education only and does not replace professional medical advice.
+              </p>
+            </div>
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine/75">Explore</p>
+              <div class="mt-3 flex flex-col gap-2">
+                <a href={withBasePath("/calculators")} class="hover:text-pine">All calculators</a>
+                <a href={withBasePath("/blog")} class="hover:text-pine">Health guides</a>
+                <a href={withBasePath("/contact")} class="hover:text-pine">Contact</a>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.16em] text-pine/75">Policies</p>
+              <div class="mt-3 flex flex-col gap-2 leading-7">
+                <a href={withBasePath("/privacy-policy")} class="hover:text-pine">Privacy Policy</a>
+                <a href={withBasePath("/medical-disclaimer")} class="hover:text-pine">Medical Disclaimer</a>
+                <p class="text-ink/68">Simple tools and articles for common health topics.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

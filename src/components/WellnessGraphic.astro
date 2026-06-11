@@ -1,0 +1,84 @@
+---
+type Variant = "hero" | "compact" | "tile";
+
+type Props = {
+  variant?: Variant;
+  title?: string;
+};
+
+const { variant = "hero", title = "Health visualization" } = Astro.props;
+const isHero = variant === "hero";
+const isTile = variant === "tile";
+---
+
+<div
+  class={`wellness-graphic ${
+    isHero ? "wellness-graphic-hero" : isTile ? "wellness-graphic-tile" : "wellness-graphic-compact"
+  }`}
+  aria-hidden="true"
+>
+  <svg
+    viewBox={isHero ? "0 0 420 320" : isTile ? "0 0 220 170" : "0 0 280 220"}
+    role="img"
+    aria-label={title}
+    class="h-full w-full"
+  >
+    <defs>
+      <linearGradient id={`bg-${variant}`} x1="0%" x2="100%" y1="0%" y2="100%">
+        <stop offset="0%" stop-color="rgba(223,245,238,0.98)"></stop>
+        <stop offset="55%" stop-color="rgba(216,239,247,0.94)"></stop>
+        <stop offset="100%" stop-color="rgba(255,239,232,0.92)"></stop>
+      </linearGradient>
+      <linearGradient id={`pulse-${variant}`} x1="0%" x2="100%" y1="0%" y2="0%">
+        <stop offset="0%" stop-color="#1f5d57"></stop>
+        <stop offset="55%" stop-color="#5fa48f"></stop>
+        <stop offset="100%" stop-color="#f07f5a"></stop>
+      </linearGradient>
+    </defs>
+
+    <rect
+      x="8"
+      y="8"
+      width={isHero ? "404" : isTile ? "204" : "264"}
+      height={isHero ? "304" : isTile ? "154" : "204"}
+      rx="34"
+      fill={`url(#bg-${variant})`}
+    ></rect>
+    <circle cx={isHero ? "316" : isTile ? "158" : "214"} cy={isHero ? "96" : isTile ? "62" : "76"} r={isHero ? "70" : isTile ? "34" : "48"} fill="rgba(255,255,255,0.42)"></circle>
+    <circle cx={isHero ? "316" : isTile ? "158" : "214"} cy={isHero ? "96" : isTile ? "62" : "76"} r={isHero ? "94" : isTile ? "48" : "68"} fill="none" stroke="rgba(31,93,87,0.10)" stroke-width="2"></circle>
+    <circle cx={isHero ? "316" : isTile ? "158" : "214"} cy={isHero ? "96" : isTile ? "62" : "76"} r={isHero ? "118" : isTile ? "62" : "88"} fill="none" stroke="rgba(31,93,87,0.06)" stroke-width="2"></circle>
+
+    <path
+      d={
+        isHero
+          ? "M52 194 C98 164, 140 220, 182 184 S270 146, 322 170 S374 202, 392 160"
+          : isTile
+            ? "M28 108 C54 90, 78 122, 102 104 S146 84, 170 96 S190 110, 198 92"
+            : "M36 138 C72 116, 100 154, 132 130 S194 102, 226 118 S248 136, 258 112"
+      }
+      fill="none"
+      stroke={`url(#pulse-${variant})`}
+      stroke-width={isHero ? "10" : isTile ? "6" : "8"}
+      stroke-linecap="round"
+    ></path>
+
+    <g>
+      <rect x={isHero ? "46" : isTile ? "22" : "28"} y={isHero ? "54" : isTile ? "34" : "42"} width={isHero ? "132" : isTile ? "74" : "92"} height={isHero ? "84" : isTile ? "48" : "60"} rx="20" fill="rgba(255,255,255,0.78)"></rect>
+      <text x={isHero ? "64" : isTile ? "32" : "42"} y={isHero ? "86" : isTile ? "52" : "66"} fill="#1f5d57" font-size={isHero ? "14" : isTile ? "8" : "11"} font-weight="700" letter-spacing="2">WELLNESS</text>
+      <text x={isHero ? "64" : isTile ? "32" : "42"} y={isHero ? "114" : isTile ? "70" : "88"} fill="#183237" font-size={isHero ? "26" : isTile ? "12" : "18"} font-weight="800">Clear Signals</text>
+    </g>
+
+    <g>
+      <rect x={isHero ? "66" : isTile ? "32" : "40"} y={isHero ? "226" : isTile ? "120" : "162"} width={isHero ? "110" : isTile ? "62" : "78"} height={isHero ? "20" : isTile ? "12" : "16"} rx="10" fill="rgba(31,93,87,0.12)"></rect>
+      <rect x={isHero ? "66" : isTile ? "32" : "40"} y={isHero ? "226" : isTile ? "120" : "162"} width={isHero ? "74" : isTile ? "42" : "52"} height={isHero ? "20" : isTile ? "12" : "16"} rx="10" fill="#5fa48f"></rect>
+      <rect x={isHero ? "196" : isTile ? "106" : "132"} y={isHero ? "226" : isTile ? "120" : "162"} width={isHero ? "110" : isTile ? "62" : "78"} height={isHero ? "20" : isTile ? "12" : "16"} rx="10" fill="rgba(31,93,87,0.12)"></rect>
+      <rect x={isHero ? "196" : isTile ? "106" : "132"} y={isHero ? "226" : isTile ? "120" : "162"} width={isHero ? "88" : isTile ? "48" : "62"} height={isHero ? "20" : isTile ? "12" : "16"} rx="10" fill="#1f5d57"></rect>
+    </g>
+
+    <g>
+      <rect x={isHero ? "248" : isTile ? "128" : "160"} y={isHero ? "182" : isTile ? "92" : "126"} width={isHero ? "116" : isTile ? "70" : "88"} height={isHero ? "58" : isTile ? "36" : "44"} rx="18" fill="rgba(255,255,255,0.76)"></rect>
+      <text x={isHero ? "268" : isTile ? "140" : "176"} y={isHero ? "206" : isTile ? "108" : "144"} fill="#1f5d57" font-size={isHero ? "12" : isTile ? "7" : "10"} font-weight="700" letter-spacing="2">RESULT</text>
+      <text x={isHero ? "268" : isTile ? "140" : "176"} y={isHero ? "228" : isTile ? "124" : "162"} fill="#183237" font-size={isHero ? "18" : isTile ? "10" : "14"} font-weight="800">Guided + Useful</text>
+    </g>
+  </svg>
+</div>

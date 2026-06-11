@@ -1,0 +1,14 @@
+---
+type Props = {
+  enabled?: boolean;
+  label?: string;
+};
+
+const { enabled = false, label = "Reserved for Google AdSense" } = Astro.props;
+---
+
+{enabled && (
+  <div class="rounded-[1.75rem] border border-dashed border-ink/20 bg-white/55 px-6 py-8 text-center text-sm text-ink/55">
+    {label}
+  </div>
+)}
